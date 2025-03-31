@@ -2,29 +2,25 @@ import json
 
 from pydantic_tfl_api import JourneyClient
 from pydantic_tfl_api.core.package_models import ApiError
-from pydantic_tfl_api.models import Journey, Leg
+from pydantic_tfl_api.models import ItineraryResult
+
+from data_model.journey_models import (
+    DisambiguationOption,
+    JourneyOption,
+    get_journey_detail,
+)
 
 journey_client = JourneyClient()
 
 
-def get_leg_detail(leg: Leg) -> dict:
-    return {
-        "duration": leg.duration,
-        "instruction": leg.instruction.summary,
-        "mode": leg.mode.name,
-    }
+def from_tfl_api_model(response: ItineraryResult) -> list[JourneyOption]:
+    return list(map(get_journey_detail, response.journeys))
 
 
-def get_journey_detail(journey: Journey) -> dict:
-    return {
-        "duration": journey.duration,
-        "fare": journey.fare.totalCost if journey.fare else None,
-        "legs": list(map(get_leg_detail, journey.legs)),
-    }
-
-
-# TODO: Define a proper output format
-def plan_journey(start: str, finish: str):
+# Note: Consumers of this function should handle the conversion of the data models to relevant formats for LLM input.
+def plan_journey(
+    start: str, finish: str
+) -> list[DisambiguationOption] | list[JourneyOption]:
     # TODO: Add the full set of parameters
     resp = journey_client.JourneyResultsByPathFromPathToQueryViaQueryNationalSearchQueryDateQu(
         from_field=start, to=finish
@@ -35,12 +31,7 @@ def plan_journey(start: str, finish: str):
         # for clarification
         print(json.dumps(json.loads(resp.message), indent=2))
         raise Exception(f"API Error: {resp.message}")
-    resp_content = resp.content
-    short_output = {
-        "journeys": list(map(get_journey_detail, resp_content.journeys)),
-    }
-    print(json.dumps(short_output, indent=2))
-    return short_output
+    return from_tfl_api_model(resp.content)
 
 
 if __name__ == "__main__":
