@@ -1,0 +1,7 @@
+[project]
+version = "0.0.1"
+name = "tracks"
+dependencies = [
+    "langchain_google_vertexai",
+    "langgraph",
+]
