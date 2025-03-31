@@ -4,4 +4,5 @@ name = "tracks"
 dependencies = [
     "langchain_google_vertexai",
     "langgraph",
+    "pydantic-tfl-api",
 ]
