@@ -7,7 +7,8 @@ from pydantic_tfl_api.models.ItineraryResult import Journey
 
 class DisambiguationOption(BaseModel):
     original_input: str
-    options: list[tuple[str, str]]  # List of tuples (name, id)
+    original_input_field: str
+    options: list[tuple[str, str, int]]  # List of tuples (name, id, quality)
 
 
 class JourneyOption(BaseModel):
