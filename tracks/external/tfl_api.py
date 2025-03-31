@@ -5,7 +5,7 @@ from pydantic_tfl_api import JourneyClient
 from pydantic_tfl_api.core.package_models import ApiError
 from pydantic_tfl_api.models import ItineraryResult
 
-from data_model.journey_models import (
+from tracks.data_model.journey_models import (
     DisambiguationOption,
     JourneyOption,
     get_journey_detail,
