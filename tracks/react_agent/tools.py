@@ -14,4 +14,11 @@ from typing_extensions import Annotated
 
 from tracks.react_agent.configuration import Configuration
 
-TOOLS: List[Callable[..., Any]] = []
+
+def check_tfl(start: str, end: str) -> str:
+    """call the TfL API to get a route given a start point and an end point.
+    currently this is a dummy function that always returns "nya"."""
+    return "take the bus 69 from {} to {}.".format(start, end)
+
+
+TOOLS: List[Callable[..., Any]] = [check_tfl]
