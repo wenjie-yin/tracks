@@ -2,10 +2,11 @@
 version = "0.0.1"
 name = "tracks"
 dependencies = [
+    "langchain",
     "langchain_google_vertexai",
     "langgraph",
-    "pydantic-tfl-api",
     "pydantic",
+    "pydantic-tfl-api",
 ]
 
 [tool.isort]
