@@ -7,6 +7,8 @@ dependencies = [
     "langgraph",
     "pydantic",
     "pydantic-tfl-api",
+    "dotenv",
+    "python-telegram-bot"
 ]
 
 [tool.isort]
