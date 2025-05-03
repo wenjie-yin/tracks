@@ -8,7 +8,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import ToolNode
 from langgraph.graph import MessagesState, StateGraph, START, END
 
-from src.external.tfl_api import plan_journey
+from tracks.external.tfl_api import plan_journey
 
 
 @tool
