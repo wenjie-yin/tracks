@@ -25,18 +25,15 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
+
     await update.message.reply_text(update.message.text)
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle errors."""
-    loop = asyncio.get_running_loop()
     
-    await loop.run_in_executor(
-        None,
-        lambda: logger.error("Update caused error. Error: %s. User message (if any): %s",
+    logger.error("Update caused error. Error: %s. User message (if any): %s",
                              context.error,
                              update.message.text if update and update.message else None)
-    )
 
 def start_bot() -> None:
     """Start the bot."""
