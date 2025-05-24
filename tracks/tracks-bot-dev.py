@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import asyncio
 import os
 import logging
 from telegram import Update
@@ -6,7 +7,8 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 
 load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-
+if not TOKEN:
+    raise ValueError("Please set the TELEGRAM_BOT_TOKEN environment variable.")
 
 # Configure logging
 logging.basicConfig(
@@ -27,9 +29,16 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle errors."""
-    await logger.error(f"Update {update} caused error {context.error}")
+    loop = asyncio.get_running_loop()
+    
+    await loop.run_in_executor(
+        None,
+        lambda: logger.error("Update caused error. Error: %s. User message (if any): %s",
+                             context.error,
+                             update.message.text if update and update.message else None)
+    )
 
-def main() -> None:
+def start_bot() -> None:
     """Start the bot."""
     # Create the Application
     application = Application.builder().token(TOKEN).build()
@@ -45,4 +54,4 @@ def main() -> None:
     application.run_polling()
 
 if __name__ == "__main__":
-    main()
+    start_bot()
