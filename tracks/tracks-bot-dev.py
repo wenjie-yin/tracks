@@ -1,5 +1,4 @@
 from dotenv import load_dotenv
-import asyncio
 import os
 import logging
 from telegram import Update
@@ -11,11 +10,6 @@ from telegram.ext import (
     ContextTypes,
 )
 
-load_dotenv()
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-if not TOKEN:
-    raise ValueError("Please set the TELEGRAM_BOT_TOKEN environment variable.")
-
 # Configure logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -23,44 +17,64 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a welcome message when the command /start is issued."""
-    await update.message.reply_text(
-        "Hi! I'm an echo bot. Send me any message and I'll repeat it back to you!"
-    )
+class TrackBot:
+    """Main class for running the tracks service as a Telegram bot."""
 
+    token: str  # Telegram bot token
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Echo the user message."""
+    def __init__(self, token: str):
+        """Initialize the bot with the provided token."""
+        self.token = token
 
-    await update.message.reply_text(update.message.text)
+    async def start_command(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """Send a welcome message when the command /start is issued."""
+        await update.message.reply_text(
+            "Hi! I'm an echo bot. Send me any message and I'll repeat it back to you!"
+        )
 
+    async def echo_command(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """Echo the user message."""
 
-async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle errors."""
+        await update.message.reply_text(update.message.text)
 
-    logger.error(
-        "Update caused error. Error: %s. User message (if any): %s",
-        context.error,
-        update.message.text if update and update.message else None,
-    )
+    async def error_handler(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """Handle errors."""
 
+        logger.error(
+            "Update caused error. Error: %s. User message (if any): %s",
+            context.error,
+            update.message.text if update and update.message else None,
+        )
 
-def start_bot() -> None:
-    """Start the bot."""
-    # Create the Application
-    application = Application.builder().token(TOKEN).build()
+    def start(self) -> None:
+        """Start the bot."""
+        # Create the Application
+        application = Application.builder().token(self.token).build()
 
-    # Add handlers
-    application.add_handler(CommandHandler("start", start_command))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+        # Add handlers
+        application.add_handler(CommandHandler("start", self.start_command))
+        application.add_handler(
+            MessageHandler(filters.TEXT & ~filters.COMMAND, self.echo_command)
+        )
 
-    # Add error handler
-    application.add_error_handler(error_handler)
+        # Add error handler
+        application.add_error_handler(self.error_handler)
 
-    # Start the bot
-    application.run_polling()
+        # Start the bot
+        application.run_polling()
 
 
 if __name__ == "__main__":
-    start_bot()
+    load_dotenv()
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not token:
+        raise ValueError("Please set the TELEGRAM_BOT_TOKEN environment variable.")
+
+    track_bot = TrackBot(token=token)
+    track_bot.start()
