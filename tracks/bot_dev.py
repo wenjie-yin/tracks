@@ -55,9 +55,14 @@ class TrackBot:
     def start(self) -> None:
         """Start the bot."""
         # Create the Application
-        application = Application.builder().token(self.token).build()
+        application = self._get_application()
 
-        # Add handlers
+        # Start the bot
+        application.run_polling()
+
+    def _get_application(self) -> Application:
+        """Get the application instance."""
+        application = Application.builder().token(self.token).build()
         application.add_handler(CommandHandler("start", self.start_command))
         application.add_handler(
             MessageHandler(filters.TEXT & ~filters.COMMAND, self.echo_command)
@@ -66,8 +71,7 @@ class TrackBot:
         # Add error handler
         application.add_error_handler(self.error_handler)
 
-        # Start the bot
-        application.run_polling()
+        return application
 
 
 if __name__ == "__main__":
